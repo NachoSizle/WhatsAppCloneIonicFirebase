@@ -1,0 +1,16 @@
+<ion-content padding>
+  <h2 text-center>Create Account</h2>
+  <ion-list>
+    <ion-item>
+      <ion-input [(ngModel)]="email" type="email" placeholder="Username"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-input [(ngModel)]="password" type="password" placeholder="Password"></ion-input>
+    </ion-item>
+  </ion-list>
+
+  <button block ion-button (click)="signUp($event)">
+    Create Account
+  </button>
+</ion-content>
