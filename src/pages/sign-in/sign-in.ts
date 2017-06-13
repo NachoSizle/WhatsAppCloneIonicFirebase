@@ -22,7 +22,6 @@ export class SignInPage {
   }
 
   signIn(event) {
-
     this._auth.signInWithEmailAndPassword(this.email, this.password)
         .then(() => this.onSignInSuccess());
   }

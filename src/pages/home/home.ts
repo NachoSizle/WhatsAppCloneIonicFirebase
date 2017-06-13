@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { NavController, AlertController, ActionSheetController } from 'ionic-angular';
+import { NavController, AlertController, ActionSheetController, LoadingController, NavParams } from 'ionic-angular';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { AuthServiceProvider } from '../../providers/auth-service/auth-service';
@@ -13,24 +13,64 @@ import * as firebase from 'firebase/app';
 export class HomePage {
 
   songs: FirebaseListObservable<any>;
+  referenceUsers;
   user: Observable<firebase.User>;
+  uidUser: string;
+  loader;
 
   constructor(public afAuth: AngularFireAuth,
     public navCtrl: NavController,
     public alertCtrl: AlertController,
     public actionSheetCtrl: ActionSheetController,
     public af: AngularFireDatabase,
-    private _auth: AuthServiceProvider) {
+    private _auth: AuthServiceProvider,
+    public loadingCtrl: LoadingController,
+    public navParams: NavParams) {
 
-    this.user = afAuth.authState;
+    var loadDataWhenUserLoggedIn = false;
+    console.log("Constructor - Home");
+
+    this.afAuth.authState.subscribe((user: firebase.User) => {
+      if(!user){
+        loadDataWhenUserLoggedIn = false;
+      } else {
+        loadDataWhenUserLoggedIn = true;
+      }
+      if(loadDataWhenUserLoggedIn){
+        this.presentLoading();
+        this.songs = this.af.list('/songs');
+        this.uidUser = user.uid;
+        this.referenceUsers = firebase.database().ref('users/' + this.uidUser);
+      } else {
+        console.log("Not user logged in");
+        if(this.songs){
+          this.songs.$ref.off();
+          this.referenceUsers.$ref.off();
+        }
+      }
+    });
+
+
   }
 
   ionViewDidEnter() {
-    console.log(this.user);
 
-    if(this.user){
-      this.songs = this.af.list('/songs');
-    }
+  }
+
+  ionViewDidLoad() {
+    console.log('ionViewDidLoad HomePage');
+  }
+
+  presentLoading() {
+    this.loader = this.loadingCtrl.create({
+      content: "Please wait...",
+      duration: 3000
+    });
+    this.loader.present();
+  }
+
+  hideLoading(){
+    this.loader.dismiss();
   }
 
   addSong(){
@@ -60,6 +100,13 @@ export class HomePage {
             this.songs.push({
               title: data.title,
               artist: data.artist
+            });
+
+            this.referenceUsers.push({
+              songs : {
+                title: data.title,
+                artist: data.artist
+              }
             });
           }
         }
