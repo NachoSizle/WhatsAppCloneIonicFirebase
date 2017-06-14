@@ -14,7 +14,9 @@ export class HomePage {
 
   songs: FirebaseListObservable<any>;
   referenceUsers;
+  songsFromUser: FirebaseListObservable<any>;
   user: Observable<firebase.User>;
+  username;
   uidUser: string;
   loader;
 
@@ -38,19 +40,19 @@ export class HomePage {
       }
       if(loadDataWhenUserLoggedIn){
         this.presentLoading();
-        this.songs = this.af.list('/songs');
         this.uidUser = user.uid;
-        this.referenceUsers = firebase.database().ref('users/' + this.uidUser);
+        this.referenceUsers = this.af.list('users/' + this.uidUser);
+        this.songsFromUser = this.af.list('users/' + this.uidUser + '/songs');
+
+        this.username = user.email;
       } else {
         console.log("Not user logged in");
-        if(this.songs){
-          this.songs.$ref.off();
+        if(this.uidUser){
           this.referenceUsers.$ref.off();
+          this.songsFromUser.$ref.off();
         }
       }
     });
-
-
   }
 
   ionViewDidEnter() {
@@ -58,13 +60,13 @@ export class HomePage {
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad HomePage');
+
   }
 
   presentLoading() {
     this.loader = this.loadingCtrl.create({
       content: "Please wait...",
-      duration: 3000
+      duration: 2000
     });
     this.loader.present();
   }
@@ -97,16 +99,9 @@ export class HomePage {
         {
           text: 'Save',
           handler: data => {
-            this.songs.push({
+            this.songsFromUser.push({
               title: data.title,
               artist: data.artist
-            });
-
-            this.referenceUsers.push({
-              songs : {
-                title: data.title,
-                artist: data.artist
-              }
             });
           }
         }
@@ -143,7 +138,7 @@ export class HomePage {
     }
 
     removeSong(songId: string){
-      this.songs.remove(songId);
+      this.songsFromUser.remove(songId);
     }
 
     updateSong(songId, songTitle){
@@ -167,8 +162,8 @@ export class HomePage {
           {
             text: 'Save',
             handler: data => {
-              this.songs.update(songId, {
-                title: data.title
+              this.songsFromUser.update(songId,{
+                title: data.title,
               });
             }
           }

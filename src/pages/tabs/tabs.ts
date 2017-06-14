@@ -3,22 +3,25 @@ import { AboutPage } from '../about/about';
 import { ContactPage } from '../contact/contact';
 import { HomePage } from '../home/home';
 import { SignInAndUpComponent } from '../../components/sign-in-and-up/sign-in-and-up';
-import { NavController } from 'ionic-angular';
+import { NavController, Tab} from 'ionic-angular';
 import { AuthServiceProvider } from '../../providers/auth-service/auth-service';
 import { AngularFireAuth } from 'angularfire2/auth';
 
 @Component({
   templateUrl: 'tabs.html'
 })
+
 export class TabsPage {
 
   tab1Root = HomePage;
   tab2Root = AboutPage;
   tab3Root = ContactPage;
+  selectIndex = 0;
 
   constructor(public afAuth: AngularFireAuth,
               private authService: AuthServiceProvider,
-              private navCtrl: NavController) {
+              private navCtrl: NavController
+              ) {
     console.log("Constructor");
 
     this.afAuth.auth.onAuthStateChanged(function(user){
@@ -27,6 +30,8 @@ export class TabsPage {
         console.log("Sign in");
         if(navCtrl.canGoBack()){
           navCtrl.popToRoot();
+          console.log(navCtrl.getViews());
+          this.selectIndex = 0;
         }
       } else {
         // No user is signed in.
@@ -36,7 +41,16 @@ export class TabsPage {
     });
   }
 
+  tabSelected(tab: Tab) {
+
+  }
+
   ionViewDidLoad() {
   }
 
+  ionViewDidEnter() {
+  }
+
+  ionViewDidLeave(){
+  }
 }
