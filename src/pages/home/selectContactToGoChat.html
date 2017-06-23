@@ -1,0 +1,24 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>
+      Select contact...
+    </ion-title>
+    <ion-buttons end>
+      <button ion-button icon-only (tap)="dismiss()">
+        <ion-icon name="close"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <ion-searchbar (ionInput)="getContacts($event)"></ion-searchbar>
+  <ion-list>
+    <ion-item *ngFor="let contact of arrayNamesContacts" (tap)="setSelectContact(contact)">
+      <ion-avatar item-left>
+        <img src="assets/img/{{ contact }}.png">
+      </ion-avatar>
+      <h2><b>{{ contact }}</b></h2>
+    </ion-item>
+  </ion-list>
+</ion-content>

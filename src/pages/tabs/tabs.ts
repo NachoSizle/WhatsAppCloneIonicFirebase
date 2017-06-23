@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { AboutPage } from '../about/about';
-import { ContactPage } from '../contact/contact';
+import { ProfilePage } from '../profile/profile';
+import { ContactsPage } from '../contacts/contacts';
 import { HomePage } from '../home/home';
 import { SignInAndUpComponent } from '../../components/sign-in-and-up/sign-in-and-up';
 import { NavController, Tab} from 'ionic-angular';
@@ -14,8 +14,8 @@ import { AngularFireAuth } from 'angularfire2/auth';
 export class TabsPage {
 
   tab1Root = HomePage;
-  tab2Root = AboutPage;
-  tab3Root = ContactPage;
+  tab2Root = ContactsPage;
+  tab3Root = ProfilePage;
   selectIndex = 0;
 
   constructor(public afAuth: AngularFireAuth,

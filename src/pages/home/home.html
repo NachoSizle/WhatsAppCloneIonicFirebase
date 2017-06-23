@@ -2,19 +2,25 @@
   <ion-navbar>
     <ion-title>Home</ion-title>
     <ion-buttons end>
-      <button ion-button icon-only (click)="addSong()">
-        <ion-icon name="add"></ion-icon>
+      <button ion-button icon-only (click)="newChat()">
+        <ion-icon name="ios-open-outline"></ion-icon>
       </button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>
 
-<ion-content padding>
-  <h2>Welcome back {{username}}</h2>
-
+<ion-content>
   <ion-list>
-    <ion-item *ngFor="let song of songsFromUser | async" (click)="showOptions(song.$key, song.title)">
-      {{song.title}} - {{song.artist}}
-    </ion-item>
+
+    <ion-list>
+      <ion-item *ngFor="let usr of users | async" (click)="showOptions(usr)">
+        <ion-avatar item-start>
+          <img src="./assets/img/charmander.png">
+        </ion-avatar>
+        <h2>{{usr.username}}</h2>
+      </ion-item>
+    </ion-list>
+
   </ion-list>
+
 </ion-content>

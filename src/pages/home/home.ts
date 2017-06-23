@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { NavController, AlertController, ActionSheetController, LoadingController, NavParams } from 'ionic-angular';
+import { ViewController, NavController, ModalController, AlertController, ActionSheetController, LoadingController, NavParams } from 'ionic-angular';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { AuthServiceProvider } from '../../providers/auth-service/auth-service';
@@ -14,7 +14,7 @@ export class HomePage {
 
   songs: FirebaseListObservable<any>;
   referenceUsers;
-  songsFromUser: FirebaseListObservable<any>;
+  users: FirebaseListObservable<any>;
   user: Observable<firebase.User>;
   username;
   uidUser: string;
@@ -27,7 +27,8 @@ export class HomePage {
     public af: AngularFireDatabase,
     private _auth: AuthServiceProvider,
     public loadingCtrl: LoadingController,
-    public navParams: NavParams) {
+    public navParams: NavParams,
+    public modalCtrl: ModalController) {
 
     var loadDataWhenUserLoggedIn = false;
     console.log("Constructor - Home");
@@ -42,17 +43,17 @@ export class HomePage {
         this.presentLoading();
         this.uidUser = user.uid;
         this.referenceUsers = this.af.list('users/' + this.uidUser);
-        this.songsFromUser = this.af.list('users/' + this.uidUser + '/songs');
-
+        this.users = this.af.list('users/');
         this.username = user.email;
       } else {
         console.log("Not user logged in");
         if(this.uidUser){
           this.referenceUsers.$ref.off();
-          this.songsFromUser.$ref.off();
+          this.users.$ref.off();
         }
       }
     });
+
   }
 
   ionViewDidEnter() {
@@ -75,6 +76,22 @@ export class HomePage {
     this.loader.dismiss();
   }
 
+  newChat(){
+    let findContactModal = this.modalCtrl.create(SelectContactToGoChat);
+    findContactModal.onDidDismiss(data => {
+      /*
+      if(data != null){
+        console.log("Entrando a conver -- ChatPage");
+        this.navCtrl.push(ConversationPage, {
+          'contactToChat' : data.nameContact
+        });
+      }
+      */
+    });
+    findContactModal.present();
+  }
+
+  /*
   addSong(){
     let prompt = this.alertCtrl.create({
       title: 'Song Name',
@@ -99,7 +116,7 @@ export class HomePage {
         {
           text: 'Save',
           handler: data => {
-            this.songsFromUser.push({
+            this.chatsFromUser.push({
               title: data.title,
               artist: data.artist
             });
@@ -115,15 +132,20 @@ export class HomePage {
       title: 'What do you want to do?',
       buttons: [
         {
-          text: 'Delete Song',
-          role: 'destructive',
+          text: 'Play song',
           handler: () => {
-            this.removeSong(songId);
+            this.playSong(songId);
           }
         },{
           text: 'Update title',
           handler: () => {
             this.updateSong(songId, songTitle);
+          }
+        },{
+          text: 'Delete Song',
+          role: 'destructive',
+          handler: () => {
+            this.removeSong(songId);
           }
         },{
           text: 'Cancel',
@@ -136,9 +158,13 @@ export class HomePage {
     });
     actionSheet.present();
     }
-
+    */
+    playSong(songId: string){
+      console.log(songId);
+    }
+    /*
     removeSong(songId: string){
-      this.songsFromUser.remove(songId);
+      this.chatsFromUser.remove(songId);
     }
 
     updateSong(songId, songTitle){
@@ -162,7 +188,7 @@ export class HomePage {
           {
             text: 'Save',
             handler: data => {
-              this.songsFromUser.update(songId,{
+              this.chatsFromUser.update(songId,{
                 title: data.title,
               });
             }
@@ -171,4 +197,48 @@ export class HomePage {
       });
       prompt.present();
     }
+    */
+}
+
+@Component({templateUrl: 'selectContactToGoChat.html'})
+
+export class SelectContactToGoChat {
+
+searchQuery: string = '';
+arrayNamesContacts: String[] = [];
+
+ constructor(public params: NavParams,
+             public modalCtrl: ModalController,
+             public navCtrl: NavController,
+             public viewCtrl: ViewController,
+            ) {
+ }
+
+ ionViewWillEnter(){
+
+ }
+
+ getContacts(ev: any) {
+   // set val to the value of the searchbar
+   let val = ev.target.value;
+   console.log(val);
+   // if the value is an empty string don't filter the items
+   if (val != '' && val != null) {
+     this.arrayNamesContacts = this.arrayNamesContacts.filter((contactFound) => {
+       return (contactFound.toLowerCase().indexOf(val.toLowerCase()) > -1);
+     })
+   } else {
+      console.log("Reestablecer criterio de bussqueda");
+   }
+ }
+ /*
+ setSelectContact(contactSelected){
+   let data = { 'nameContact': contactSelected };
+   this.viewCtrl.dismiss(data);
+ }
+ */
+ dismiss() {
+  this.viewCtrl.dismiss();
+ }
+
 }
